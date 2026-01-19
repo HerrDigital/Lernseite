@@ -1,0 +1,661 @@
+<!DOCTYPE html>
+<html lang="de">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no">
+    <title>Lernmodul: Merkantilismus</title>
+    <script src="https://cdn.tailwindcss.com"></script>
+    <link href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.0.0/css/all.min.css" rel="stylesheet">
+    <style>
+        @import url('https://fonts.googleapis.com/css2?family=Coming+Soon&family=Noto+Sans:wght@400;600;700&display=swap');
+
+        body { font-family: 'Noto Sans', sans-serif; background-color: #f0f4f8; color: #1e293b; -webkit-tap-highlight-color: transparent; }
+        
+        /* Level Buttons */
+        .level-btn { transition: all 0.2s; touch-action: manipulation; }
+        .level-active { transform: translateY(-2px); box-shadow: 0 4px 6px -1px rgba(0, 0, 0, 0.1); border-bottom: 4px solid currentColor; }
+        
+        /* Interactive Elements for iPad */
+        select, input, button, .quiz-option { cursor: pointer; touch-action: manipulation; }
+        select { background-image: url("data:image/svg+xml,%3csvg xmlns='http://www.w3.org/2000/svg' fill='none' viewBox='0 0 20 20'%3e%3cpath stroke='%236b7280' stroke-linecap='round' stroke-linejoin='round' stroke-width='1.5' d='M6 8l4 4 4-4'/%3e%3c/svg%3e"); background-position: right 0.5rem center; background-repeat: no-repeat; background-size: 1.5em 1.5em; padding-right: 2.5rem; appearance: none; }
+        
+        .correct { background-color: #dcfce7 !important; border-color: #22c55e !important; color: #14532d; }
+        .wrong { background-color: #fee2e2 !important; border-color: #ef4444 !important; color: #7f1d1d; }
+        
+        /* Loading Spinner */
+        .spinner { border: 3px solid rgba(255,255,255,0.3); border-radius: 50%; border-top: 3px solid #fff; width: 20px; height: 20px; animation: spin 1s linear infinite; display: inline-block; vertical-align: middle; margin-right: 8px; }
+        @keyframes spin { 0% { transform: rotate(0deg); } 100% { transform: rotate(360deg); } }
+
+        @media print { .no-print { display: none !important; } body { background: white; padding: 0; } details { display: block !important; } summary { display: none; } }
+    </style>
+</head>
+<body class="p-3 md:p-8 pb-24">
+
+    <!-- Steuerung & Header -->
+    <div class="max-w-4xl mx-auto mb-6 no-print flex flex-col md:flex-row justify-between items-center gap-4 bg-white p-4 rounded-xl shadow-sm border sticky top-2 z-50 bg-opacity-95 backdrop-blur">
+        <div class="flex items-center gap-4 w-full md:w-auto">
+            <h1 class="text-xl font-bold text-slate-800 whitespace-nowrap"><i class="fas fa-crown text-yellow-500 mr-2"></i>Merkantilismus</h1>
+            
+            <!-- Story Button (AI) -->
+            <button onclick="generateStory()" id="storyBtn" class="bg-purple-600 text-white text-xs md:text-sm px-3 py-2 rounded-full font-bold shadow hover:bg-purple-700 transition flex items-center">
+                <i class="fas fa-magic mr-1"></i> Story-Modus
+            </button>
+        </div>
+        
+        <div class="flex gap-2 w-full md:w-auto overflow-x-auto pb-1">
+            <button onclick="changeLevel('ESA')" id="btn-ESA" class="level-btn flex-1 md:flex-none whitespace-nowrap px-4 py-3 rounded-lg bg-green-100 text-green-700 font-bold border-b-2 border-transparent">Leicht (ESA)</button>
+            <button onclick="changeLevel('MSA')" id="btn-MSA" class="level-btn flex-1 md:flex-none whitespace-nowrap px-4 py-3 rounded-lg bg-blue-100 text-blue-700 font-bold border-b-2 border-blue-600 level-active">Mittel (MSA)</button>
+            <button onclick="changeLevel('AHR')" id="btn-AHR" class="level-btn flex-1 md:flex-none whitespace-nowrap px-4 py-3 rounded-lg bg-purple-100 text-purple-700 font-bold border-b-2 border-transparent">Experte (AHR)</button>
+        </div>
+    </div>
+
+    <div class="max-w-4xl mx-auto space-y-8">
+
+        <!-- AI STORY CONTAINER (Hidden by default) -->
+        <div id="aiStoryContainer" class="hidden bg-purple-50 border-2 border-purple-200 rounded-xl p-6 no-print shadow-lg relative">
+            <button onclick="document.getElementById('aiStoryContainer').classList.add('hidden')" class="absolute top-2 right-2 text-purple-400 hover:text-purple-800"><i class="fas fa-times"></i></button>
+            <h3 class="text-purple-900 font-bold mb-2 flex items-center"><i class="fas fa-scroll mr-2"></i> Zeitreise: Paris, 1670</h3>
+            <div id="aiStoryText" class="text-slate-800 italic leading-relaxed font-serif"></div>
+        </div>
+
+        <!-- GLOSSAR (Ausklappbar) -->
+        <details class="bg-white border-l-4 border-yellow-400 shadow-md rounded-lg group no-print">
+            <summary class="p-4 font-bold cursor-pointer list-none flex justify-between items-center bg-yellow-50 rounded-t-lg select-none hover:bg-yellow-100 transition">
+                <span><i class="fas fa-book-open mr-2 text-yellow-600"></i>Wörterbuch / Glossar (Hier klicken)</span>
+                <span class="transition group-open:rotate-180 text-yellow-600"><i class="fas fa-chevron-down"></i></span>
+            </summary>
+            <div class="p-4 grid grid-cols-1 md:grid-cols-2 gap-4 text-sm" id="glossaryContent">
+                <!-- Dynamischer Inhalt -->
+            </div>
+        </details>
+
+        <!-- AUFGABE 1: Der Basistext (Länger & Ausführlicher) -->
+        <section class="bg-white shadow-lg rounded-xl p-6 md:p-8 border-t-8 border-blue-800">
+            <div class="flex items-center mb-6">
+                <span class="bg-blue-800 text-white w-10 h-10 rounded-full flex items-center justify-center mr-4 text-xl font-bold shrink-0">1</span>
+                <div>
+                    <h2 class="text-2xl font-bold text-slate-800">Die Erarbeitung</h2>
+                    <p class="text-slate-500 text-sm">Lies den Text genau. Er erklärt dir, wie Ludwigs Plan funktionierte.</p>
+                </div>
+            </div>
+            
+            <div class="leading-loose text-lg text-justify p-6 bg-slate-50 rounded-lg border border-slate-200 shadow-inner" id="textTask">
+                <!-- Inhalt wird per JS geladen -->
+            </div>
+        </section>
+
+        <!-- AUFGABE 2: Verständnis-Check (ERWEITERT) -->
+        <section class="bg-white shadow rounded-xl p-6 border-l-4 border-indigo-500">
+            <div class="flex items-center mb-4">
+                <span class="bg-indigo-600 text-white w-8 h-8 rounded-full flex items-center justify-center mr-3 font-bold shrink-0">2</span>
+                <h3 class="text-xl font-bold text-slate-800">Verständnis-Check</h3>
+            </div>
+            <p class="text-sm text-slate-500 mb-4">Überprüfe dein Wissen zu Hintergrund, Funktion und Folgen.</p>
+            <div class="grid grid-cols-1 md:grid-cols-2 gap-3" id="quizContainer">
+                <!-- Quiz wird per JS geladen -->
+            </div>
+        </section>
+
+        <!-- AUFGABE 3: Logik-Paare (ERWEITERT) -->
+        <section class="bg-white shadow rounded-xl p-6 border-l-4 border-teal-500">
+            <div class="flex items-center mb-4">
+                <span class="bg-teal-600 text-white w-8 h-8 rounded-full flex items-center justify-center mr-3 font-bold shrink-0">3</span>
+                <h3 class="text-xl font-bold text-slate-800">Maßnahme & Ziel</h3>
+            </div>
+            <p class="text-sm text-slate-500 mb-4">Welche Maßnahme führte zu welchem Ziel? Verbinde richtig.</p>
+            <div class="space-y-4" id="matchingTask">
+                <!-- Matching wird per JS geladen -->
+            </div>
+        </section>
+
+        <!-- AUFGABE 4: Fehlerkorrektur (NEU: DROPDOWN & MUSTERLÖSUNG) -->
+        <section class="bg-white shadow rounded-xl p-6 border-l-4 border-red-500">
+            <div class="flex items-center mb-4">
+                <span class="bg-red-600 text-white w-8 h-8 rounded-full flex items-center justify-center mr-3 font-bold shrink-0">4</span>
+                <h3 class="text-xl font-bold text-slate-800">Der Historiker-Check</h3>
+            </div>
+            <p class="mb-3 text-slate-700">Der Text enthält Fehler. Wähle im Dropdown den <strong>historisch richtigen</strong> Begriff aus.</p>
+            
+            <div class="bg-red-50 p-5 rounded-lg leading-loose border border-red-100 shadow-inner text-lg text-justify" id="errorTask">
+                <!-- Fehlertext mit Dropdowns -->
+            </div>
+
+            <!-- Hilfen und Lösung -->
+            <div class="mt-6 flex flex-col sm:flex-row gap-4 no-print">
+                <button onclick="toggleTask4Hint()" class="flex-1 text-sm text-red-600 font-semibold hover:text-red-800 flex items-center justify-center bg-white hover:bg-red-50 px-4 py-3 rounded border border-red-200 shadow-sm transition">
+                    <i class="fas fa-life-ring mr-2"></i> Hilfe anzeigen
+                </button>
+                <button onclick="toggleSolution4()" class="flex-1 text-sm text-white font-bold flex items-center justify-center bg-red-500 hover:bg-red-600 px-4 py-3 rounded shadow transition">
+                    <i class="fas fa-key mr-2"></i> Musterlösung anzeigen
+                </button>
+            </div>
+
+            <!-- Hilfe-Container -->
+            <div id="task4Hint" class="hidden mt-4 bg-white border-l-4 border-red-400 p-4 rounded shadow-sm text-sm text-slate-700 leading-relaxed">
+                <h4 class="font-bold text-red-800 mb-2">🕵️‍♂️ Detektiv-Hilfe: Achte auf diese Fallen!</h4>
+                <ul class="list-disc list-inside space-y-1">
+                    <li><strong>Die Bauern:</strong> Ging es ihnen gut? Nein! Die Getreidepreise wurden künstlich <em>niedrig</em> gehalten.</li>
+                    <li><strong>Der Handel:</strong> Frankreich wollte viel <em>exportieren</em> (verkaufen), aber wenig <em>importieren</em>.</li>
+                    <li><strong>Das Geld:</strong> Trotz hoher Einnahmen gaben die Könige mehr aus, als sie hatten (Schulden).</li>
+                    <li><strong>Fachbegriffe:</strong> "Physiokratie" (Vorrang der Landwirtschaft) ist das Gegenteil von Merkantilismus.</li>
+                </ul>
+            </div>
+
+            <!-- Musterlösung-Container -->
+            <div id="task4Solution" class="hidden mt-4 p-5 bg-green-50 border border-green-200 rounded-lg text-green-900 leading-relaxed relative">
+                <button onclick="this.parentElement.classList.add('hidden')" class="absolute top-2 right-2 text-green-700 hover:text-green-900"><i class="fas fa-times"></i></button>
+                <h4 class="font-bold mb-2"><i class="fas fa-check-circle mr-2"></i>Korrektur:</h4>
+                <div id="solutionText"></div>
+            </div>
+        </section>
+
+        <!-- AUFGABE 5: Schaubild beschriften -->
+        <section class="bg-white shadow rounded-xl p-6 border-l-4 border-orange-500 overflow-hidden">
+            <div class="flex items-center mb-6">
+                <span class="bg-orange-600 text-white w-8 h-8 rounded-full flex items-center justify-center mr-3 font-bold shrink-0">5</span>
+                <h3 class="text-xl font-bold text-slate-800">Schaubild: Der Warenkreislauf</h3>
+            </div>
+            <p class="text-sm text-slate-500 mb-4">Vervollständige das Schema. Tippe auf die ???-Boxen.</p>
+            
+            <div class="relative w-full aspect-[16/10] md:aspect-[16/9] bg-slate-50 rounded-xl border-2 border-slate-200 shadow-inner mx-auto max-w-2xl">
+                <!-- SVG Background -->
+                <svg class="absolute inset-0 w-full h-full" viewBox="0 0 800 450">
+                    <!-- Verbindungslinien -->
+                    <path d="M 150 225 L 300 225" stroke="#94a3b8" stroke-width="4" stroke-dasharray="8"/>
+                    <path d="M 500 225 L 650 225" stroke="#94a3b8" stroke-width="4" stroke-dasharray="8"/>
+                    
+                    <!-- Pfeile oben -->
+                    <path d="M 150 180 Q 225 150 300 180" fill="none" stroke="#22c55e" stroke-width="5" marker-end="url(#arrow-g)"/>
+                    <path d="M 500 180 Q 575 150 650 180" fill="none" stroke="#3b82f6" stroke-width="5" marker-end="url(#arrow-b)"/>
+                    
+                    <!-- Pfeil unten -->
+                    <path d="M 650 270 Q 575 300 500 270" fill="none" stroke="#ef4444" stroke-width="5" marker-end="url(#arrow-r)"/>
+
+                    <defs>
+                        <marker id="arrow-g" markerWidth="10" markerHeight="10" refX="5" refY="5" orient="auto"><path d="M0 0L10 5L0 10z" fill="#22c55e"/></marker>
+                        <marker id="arrow-b" markerWidth="10" markerHeight="10" refX="5" refY="5" orient="auto"><path d="M0 0L10 5L0 10z" fill="#3b82f6"/></marker>
+                        <marker id="arrow-r" markerWidth="10" markerHeight="10" refX="5" refY="5" orient="auto"><path d="M0 0L10 5L0 10z" fill="#ef4444"/></marker>
+                    </defs>
+                </svg>
+
+                <!-- Mitte: Frankreich -->
+                <div class="absolute top-1/2 left-1/2 transform -translate-x-1/2 -translate-y-1/2 text-center pointer-events-none">
+                    <div class="w-32 h-20 bg-blue-100 border-2 border-blue-800 rounded flex items-center justify-center font-bold text-blue-900 shadow-lg">
+                        Frankreich
+                    </div>
+                </div>
+
+                <!-- Links: Kolonien -->
+                <div class="absolute top-1/2 left-[10%] transform -translate-y-1/2 text-center">
+                     <select onchange="checkDiagram(this, 'Kolonien')" class="bg-white border-2 border-slate-300 rounded p-1 text-sm w-24 md:w-32 shadow font-bold text-center">
+                        <option value="">???</option>
+                        <option value="Kolonien">Kolonien</option>
+                        <option value="Ausland">Ausland</option>
+                        <option value="Mond">Mond</option>
+                    </select>
+                </div>
+
+                <!-- Rechts: Ausland -->
+                <div class="absolute top-1/2 right-[10%] transform -translate-y-1/2 text-center">
+                    <select onchange="checkDiagram(this, 'Ausland')" class="bg-white border-2 border-slate-300 rounded p-1 text-sm w-24 md:w-32 shadow font-bold text-center">
+                        <option value="">???</option>
+                        <option value="Kolonien">Kolonien</option>
+                        <option value="Ausland">Ausland</option>
+                    </select>
+                </div>
+
+                <!-- Oben Links: Rohstoffe -->
+                <div class="absolute top-[25%] left-[25%] transform -translate-x-1/2">
+                    <select onchange="checkDiagram(this, 'Rohstoffe')" class="bg-green-50 border-2 border-green-400 rounded p-1 text-xs md:text-sm w-28 shadow text-green-900 font-bold">
+                        <option value="">Was kommt rein?</option>
+                        <option value="Rohstoffe">Rohstoffe</option>
+                        <option value="Fertigwaren">Fertigwaren</option>
+                    </select>
+                </div>
+
+                <!-- Oben Rechts: Fertigwaren -->
+                <div class="absolute top-[25%] right-[25%] transform -translate-x-1/2">
+                    <select onchange="checkDiagram(this, 'Fertigwaren')" class="bg-blue-50 border-2 border-blue-400 rounded p-1 text-xs md:text-sm w-28 shadow text-blue-900 font-bold">
+                        <option value="">Was geht raus?</option>
+                        <option value="Rohstoffe">Rohstoffe</option>
+                        <option value="Fertigwaren">Fertigwaren</option>
+                    </select>
+                </div>
+
+                <!-- Unten Rechts: Zölle -->
+                <div class="absolute bottom-[20%] right-[30%] transform -translate-x-1/2">
+                    <select onchange="checkDiagram(this, 'Zölle')" class="bg-red-50 border-2 border-red-400 rounded p-1 text-xs md:text-sm w-32 shadow text-red-900 font-bold">
+                        <option value="">Was blockiert?</option>
+                        <option value="Zölle">Hohe Zölle</option>
+                        <option value="Freundschaft">Freundschaft</option>
+                    </select>
+                </div>
+            </div>
+        </section>
+
+        <!-- AUFGABE 6: Fazit & Bewertung (mit KI) -->
+        <section class="bg-slate-800 text-white shadow-xl rounded-xl p-6 border-t-4 border-yellow-500 mb-12">
+            <div class="flex items-center mb-4">
+                <span class="bg-yellow-500 text-slate-900 w-8 h-8 rounded-full flex items-center justify-center mr-3 font-bold shrink-0">6</span>
+                <h3 class="text-xl font-bold">Experten-Fazit</h3>
+            </div>
+            <p class="mb-4 text-slate-300">Colbert hat den Staat reich gemacht, aber zu welchem Preis? Wer waren die Verlierer dieses Systems?</p>
+            
+            <div class="space-y-4">
+                <textarea id="task6Input" class="w-full p-4 text-slate-900 rounded-lg h-32 bg-slate-100 border-2 border-slate-600 focus:border-yellow-500 focus:outline-none placeholder-slate-500" placeholder="Schreibe deine Meinung hier..."></textarea>
+                
+                <div class="flex flex-wrap gap-2 justify-between items-center">
+                    <button onclick="toggleHint()" class="text-sm text-yellow-400 underline decoration-dotted hover:text-yellow-300">Tipp anzeigen</button>
+                    
+                    <div class="flex gap-2">
+                        <!-- AI Analysis Button -->
+                        <button onclick="getAIFeedback()" id="aiFeedbackBtn" class="bg-purple-600 hover:bg-purple-500 text-white px-4 py-3 rounded-lg font-bold shadow-lg transition transform active:scale-95 flex items-center">
+                            <i class="fas fa-robot mr-2"></i> KI-Feedback
+                        </button>
+
+                        <button onclick="alert('Gut gemacht! Du hast das Modul abgeschlossen.')" class="bg-blue-600 hover:bg-blue-500 text-white px-6 py-3 rounded-lg font-bold shadow-lg transition transform active:scale-95">
+                            <i class="fas fa-check-circle mr-2"></i>Fertig
+                        </button>
+                    </div>
+                </div>
+
+                <!-- AI Response Area -->
+                <div id="aiFeedbackResponse" class="hidden mt-4 p-4 bg-purple-900/50 border border-purple-400 rounded-lg text-purple-100"></div>
+                
+                <div id="task6Hint" class="hidden bg-slate-700 p-4 rounded border-l-4 border-yellow-500 text-sm mt-2 leading-relaxed">
+                    <strong>Hinweis:</strong> Denke an die Bauern. Um die Löhne in den Manufakturen niedrig zu halten, mussten die Lebensmittel (Brot) billig sein. Die Bauern bekamen also sehr wenig Geld für ihr Getreide, mussten aber hohe Steuern zahlen.
+                </div>
+            </div>
+        </section>
+
+    </div>
+
+    <script>
+        const apiKey = ""; // API Key injected at runtime
+        let currentLevel = 'MSA';
+
+        // DATEN FÜR VERSCHIEDENE NIVEAUS
+        const content = {
+            glossary: {
+                ESA: {
+                    "Manufaktur": "Eine große Werkstatt, in der viele Menschen Dinge von Hand herstellen.",
+                    "Zoll": "Eine Strafgebühr an der Grenze, wenn man Waren importiert.",
+                    "Export": "Verkauf von Waren ins Ausland (Geld fließt nach Frankreich).",
+                    "Import": "Einkauf von Waren aus dem Ausland (Geld fließt weg).",
+                    "Rohstoff": "Material aus der Natur (Holz, Wolle), das noch nicht bearbeitet ist."
+                },
+                MSA: {
+                    "Manufaktur": "Großbetrieb mit Arbeitsteilung. Jeder Arbeiter macht nur einen Handgriff für mehr Effizienz.",
+                    "Aktive Handelsbilanz": "Wirtschaftsziel: Der Wert der Exporte muss höher sein als der der Importe.",
+                    "Protektionismus": "Schutz der eigenen Wirtschaft durch hohe Zölle auf ausländische Fertigwaren.",
+                    "Infrastruktur": "Straßen, Kanäle und Brücken, die den Handel erleichtern (z.B. Canal du Midi)."
+                },
+                AHR: {
+                    "Colbertismus": "Französische Variante des Merkantilismus mit extrem starker Staatslenkung.",
+                    "Ferme Générale": "Private Steuerpächter, die für den König Steuern eintrieben (oft sehr rücksichtslos).",
+                    "Binnenzölle": "Zölle innerhalb des Landes. Colbert schaffte diese ab, um einen einheitlichen Markt zu schaffen.",
+                    "Nullsummenspiel": "Die Idee, dass Welthandel begrenzt ist: Wenn einer gewinnt (Frankreich), muss ein anderer verlieren."
+                }
+            },
+            task1: {
+                ESA: `König Ludwig XIV. wollte das schönste Schloss der Welt haben und führte viele Kriege. Dafür brauchte er sehr viel Geld. Sein Finanzminister Colbert hatte eine Idee. Er sagte: "Wir müssen Dinge an andere Länder verkaufen. Das nennt man 
+                    <select onchange="checkTask1(this, 'Export')"><option value="">...</option><option value="Export">Export</option><option value="Import">Import</option></select>. 
+                    Aber wir dürfen fast nichts von ihnen kaufen (Import), damit das Geld in Frankreich bleibt."<br><br>
+                    Um bessere Waren herzustellen, bauten sie große Werkstätten. Diese hießen 
+                    <select onchange="checkTask1(this, 'Manufakturen')"><option value="">...</option><option value="Schulen">Schulen</option><option value="Manufakturen">Manufakturen</option></select>. 
+                    Dort arbeiteten viele Menschen zusammen wie in einer Fabrik. Frankreich brauchte dafür billiges Material wie Holz oder Wolle. Das nennt man 
+                    <select onchange="checkTask1(this, 'Rohstoffe')"><option value="">...</option><option value="Rohstoffe">Rohstoffe</option><option value="Müll">Müll</option></select>. 
+                    Diese holten sie aus den Kolonien. Damit fremde Waren nicht nach Frankreich kamen, musste man an der Grenze hohe 
+                    <select onchange="checkTask1(this, 'Zölle')"><option value="">...</option><option value="Zölle">Zölle</option><option value="Preise">Preise</option></select>
+                    bezahlen.`,
+                
+                MSA: `König Ludwig XIV. regierte absolutistisch und brauchte Unmengen an Geld für sein stehendes Heer und den Hofstaat in Versailles. Sein Minister Jean-Baptiste Colbert entwickelte ein neues Wirtschaftssystem: den **Merkantilismus**. <br><br>
+                    Das oberste Ziel war es, mehr Geld ins Land zu holen, als hinauszugeben. Man spricht von einer aktiven 
+                    <select onchange="checkTask1(this, 'Handelsbilanz')"><option value="">...</option><option value="Stimmung">Stimmung</option><option value="Handelsbilanz">Handelsbilanz</option></select>. 
+                    Dazu musste Frankreich unabhängig werden. Colbert ließ 
+                    <select onchange="checkTask1(this, 'Manufakturen')"><option value="">...</option><option value="Fabriken">Fabriken</option><option value="Manufakturen">Manufakturen</option></select>
+                    bauen. Das waren Großbetriebe mit vielen Arbeitern. Durch die Arbeitsteilung produzierten sie viel schneller Luxusgüter als normale Handwerker. <br><br>
+                    Billige 
+                    <select onchange="checkTask1(this, 'Rohstoffe')"><option value="">...</option><option value="Rohstoffe">Rohstoffe</option><option value="Fertigwaren">Fertigwaren</option></select>
+                    kamen aus den Kolonien. Um den Transport zu beschleunigen, verbesserte Colbert die 
+                    <select onchange="checkTask1(this, 'Infrastruktur')"><option value="">...</option><option value="Infrastruktur">Infrastruktur</option><option value="Armee">Armee</option></select>
+                    (z.B. Bau von Straßen und Kanälen). Gleichzeitig schützte er die Wirtschaft: Wer Waren aus dem Ausland einführte, musste hohe Zölle zahlen.`,
+                
+                AHR: `Unter Ludwig XIV. wurde die Wirtschaft komplett vom Staat gelenkt. Dieses System nennt man Merkantilismus oder Colbertismus. Colbert glaubte, dass der Reichtum eines Staates nur von der Menge an 
+                    <input type="text" placeholder="..." onblur="checkTask1(this, 'Edelmetallen')" class="border-b border-blue-500 bg-transparent w-32 text-center">
+                    in der Staatskasse abhängt. <br><br>
+                    Deshalb förderte er den Export von hochwertigen 
+                    <input type="text" placeholder="..." onblur="checkTask1(this, 'Fertigwaren')" class="border-b border-blue-500 bg-transparent w-32 text-center">
+                    (Luxusgüter). Die Produktion wurde in staatlich geförderten 
+                    <input type="text" placeholder="..." onblur="checkTask1(this, 'Manufakturen')" class="border-b border-blue-500 bg-transparent w-32 text-center">
+                    zentralisiert. Um die Transportkosten zu senken, ließ Colbert interne Zollschranken abbauen und schuf einen einheitlichen Binnenmarkt. <br><br>
+                    Nach außen hin schottete sich Frankreich jedoch ab. Durch strikten 
+                    <input type="text" placeholder="..." onblur="checkTask1(this, 'Protektionismus')" class="border-b border-blue-500 bg-transparent w-32 text-center">
+                    (Schutzzölle) wurde verhindert, dass Geld ins Ausland abfloss. Einen hohen Preis zahlten die Bauern: Damit die Arbeiter in den Städten billiges Brot hatten, wurden die Preise für landwirtschaftliche Produkte künstlich niedrig gehalten.`
+            },
+            quiz: {
+                ESA: [
+                    { q: "Warum brauchte der König so viel Geld?", correct: "Für sein Schloss und Kriege", wrong: ["Für Schulen und Krankenhäuser", "Um den Bauern zu helfen"] },
+                    { q: "Was sind Manufakturen?", correct: "Große Werkstätten mit vielen Arbeitern", wrong: ["Normale Bauernhöfe", "Kleine Läden"] },
+                    { q: "Was passierte an der Grenze?", correct: "Ausländer mussten Zoll bezahlen", wrong: ["Jeder bekam Geschenke", "Alle durften kostenlos durch"] },
+                    { q: "Wer sollte die teuren Waren kaufen?", correct: "Das Ausland (andere Länder)", wrong: ["Der König selbst", "Die armen französischen Bauern"] },
+                    { q: "Woher kamen die Rohstoffe (Holz, Wolle)?", correct: "Billig aus den Kolonien", wrong: ["Teuer aus England", "Vom Mond"] },
+                    { q: "Ging es den Bauern gut?", correct: "Nein, sie waren sehr arm", wrong: ["Ja, sie waren reich", "Es ging ihnen wie immer"] }
+                ],
+                MSA: [
+                    { q: "Was war der Auslöser für den Merkantilismus?", correct: "Die massiven Schulden Ludwigs XIV.", wrong: ["Der Wunsch der Bevölkerung nach Handel", "Ein Befehl des Papstes"] },
+                    { q: "Was bedeutet 'Aktive Handelsbilanz'?", correct: "Export > Import (Gewinn machen)", wrong: ["Import > Export (Mehr kaufen)", "Export = Import (Ausgleich)"] },
+                    { q: "Warum brauchte Colbert Kolonien?", correct: "Als Quelle für billige Rohstoffe", wrong: ["Als Urlaubsort für den Adel", "Um Gefängnisse zu bauen"] },
+                    { q: "Was unterschied Manufakturen von Handwerkern?", correct: "Arbeitsteilung und Massenproduktion", wrong: ["Einsatz von Dampfmaschinen", "Jeder Arbeiter machte ein ganzes Produkt"] },
+                    { q: "Wer waren die Verlierer des Systems?", correct: "Die Bauern (niedrige Preise, hohe Steuern)", wrong: ["Die Kaufleute", "Der König"] },
+                    { q: "Was sind Schutzzölle?", correct: "Steuern auf ausländische Fertigwaren", wrong: ["Steuern auf französische Exporte", "Gebühren für Straßenbenutzung"] }
+                ],
+                AHR: [
+                    { q: "Was ist das ökonomische Kernziel des Merkantilismus?", correct: "Akkumulation von Edelmetallen (Staatskasse füllen)", wrong: ["Steigerung des allgemeinen Wohlstands", "Förderung der Landwirtschaft"] },
+                    { q: "Wie griff der Staat in die Wirtschaft ein?", correct: "Massive Reglementierung und Förderung", wrong: ["Laissez-faire (Freier Markt)", "Nur durch Beobachtung"] },
+                    { q: "Welches Problem löste Colbert NICHT?", correct: "Die langfristige Staatsverschuldung", wrong: ["Den Ausbau der Infrastruktur", "Die Vereinheitlichung des Binnenmarktes"] },
+                    { q: "Warum wurden Getreidepreise niedrig gehalten?", correct: "Um Lohnkosten in Manufakturen zu senken", wrong: ["Um den Bauern zu helfen", "Weil es zu viel Getreide gab"] },
+                    { q: "Was bedeutet 'Merkantilistisches Dilemma'?", correct: "Wenn alle exportieren wollen, bricht der Handel zusammen", wrong: ["Man weiß nicht, was man produzieren soll", "Gold verliert an Wert"] },
+                    { q: "Welche Rolle spielte die 'Ferme Générale'?", correct: "Effiziente, aber brutale Steuereintreibung", wrong: ["Verwaltung der Kolonien", "Kontrolle der Manufakturen"] }
+                ]
+            },
+            task3: {
+                ESA: [
+                    { q: "Bau von Manufakturen", a: "Schneller viele Waren herstellen" },
+                    { q: "Hohe Zölle an der Grenze", a: "Ausländische Waren fernhalten" },
+                    { q: "Bau von Straßen & Kanälen", a: "Waren schneller transportieren" },
+                    { q: "Gründung von Kolonien", a: "Billiges Holz und Wolle bekommen" },
+                    { q: "Niedrige Preise für Brot", a: "Arbeiter brauchen wenig Lohn" }
+                ],
+                MSA: [
+                    { q: "Förderung von Manufakturen", a: "Massenproduktion von Luxusgütern" },
+                    { q: "Einfuhrzölle (Protektionismus)", a: "Schutz der heimischen Wirtschaft" },
+                    { q: "Ausbau der Infrastruktur", a: "Senkung der Transportkosten" },
+                    { q: "Niedrige Getreidepreise", a: "Niedrige Lohnkosten sichern" },
+                    { q: "Erwerb von Kolonien", a: "Unabhängigkeit von Rohstoffimporten" }
+                ],
+                AHR: [
+                    { q: "Abschaffung der Binnenzölle", a: "Schaffung eines einheitlichen Binnenmarktes" },
+                    { q: "Einführung von Qualitätsnormen", a: "Sicherung des Rufs französischer Waren" },
+                    { q: "Staatliche Handelsmonopole", a: "Kontrolle über Gewinne (z.B. Ostindienkompanie)" },
+                    { q: "Preistaxierung für Agrargüter", a: "Subventionierung des gewerblichen Sektors" },
+                    { q: "Verpachtung der Steuererhebung", a: "Sichere Einnahmen für die Krone (Ferme Générale)" }
+                ]
+            },
+            task4: {
+                ESA: "Der König brauchte viel Geld. Er [verteilte|nahm] das Gold von den Bauern. Colbert kaufte keine Waren im Ausland, sondern [verkaufte|verschenkte] französische Waren. An der Grenze waren die Zölle ganz [niedrig|hoch], damit niemand fremde Waren kauft. Die Arbeiter in den Manufakturen hatten ein [leichtes|hartes] Leben und arbeiteten sehr lange. Am Ende hatte König Ludwig XIV. [keine|riesige] Schulden.",
+                MSA: "Der Merkantilismus entstand, weil Ludwig XIV. [zu viel|zu wenig] Geld hatte. Colbert förderte vor allem die [Landwirtschaft|Manufakturen], da dort mehr Gewinn zu machen war. Die Bauern litten unter künstlich [hohen|niedrigen] Getreidepreisen und verarmten. Frankreich [importierte|exportierte] teure Fertigwaren in alle Welt. Das Ziel war eine [negative|positive] Handelsbilanz (mehr Einnahmen als Ausgaben). Am Ende war Frankreich jedoch [schuldenfrei|hochverschuldet].",
+                AHR: "Colbert setzte auf staatliche Lenkung statt auf [Freihandel|Planwirtschaft]. Die [Physiokratie|Manufakturwesen] (Gewerbe) stand im Zentrum seiner Politik, während die Landwirtschaft vernachlässigt wurde. Um die Exporte zu steigern, wurden die Löhne der Arbeiter [erhöht|niedrig gehalten]. Die Binnenzölle wurden [erhöht|abgeschafft], um den Handel im Inland zu erleichtern. Trotz der hohen Einnahmen hinterließ Ludwig XIV. einen riesigen [Staatsüberschuss|Schuldenberg]."
+            }
+        };
+
+        // --- GEMINI AI FUNCTIONS ---
+
+        // Helper: Fetch with Exponential Backoff
+        async function fetchWithRetry(url, options, retries = 5, backoff = 1000) {
+            try {
+                const res = await fetch(url, options);
+                if (!res.ok) {
+                     // Retry on 429 (Too Many Requests) or 5xx (Server Errors)
+                    if (retries > 0 && (res.status === 429 || res.status >= 500)) {
+                        throw new Error(`Retryable status: ${res.status}`);
+                    }
+                    throw new Error(`HTTP Error: ${res.status}`);
+                }
+                return res;
+            } catch (err) {
+                if (retries === 0) throw err;
+                await new Promise(r => setTimeout(r, backoff));
+                return fetchWithRetry(url, options, retries - 1, backoff * 2);
+            }
+        }
+
+        async function fetchAI(prompt, systemPrompt) {
+            // Check removed to allow environment injection/interception
+            
+            try {
+                const response = await fetchWithRetry(`https://generativelanguage.googleapis.com/v1beta/models/gemini-2.5-flash-preview-09-2025:generateContent?key=${apiKey}`, {
+                    method: 'POST',
+                    headers: { 'Content-Type': 'application/json' },
+                    body: JSON.stringify({
+                        contents: [{ parts: [{ text: prompt }] }],
+                        systemInstruction: { parts: [{ text: systemPrompt }] }
+                    })
+                });
+                
+                const data = await response.json();
+                return data.candidates?.[0]?.content?.parts?.[0]?.text || "Die KI hat keine Antwort generiert.";
+            } catch (error) {
+                console.error("AI Error:", error);
+                // More helpful error message in catch
+                return "Entschuldigung, die Verbindung zur KI ist fehlgeschlagen. (Falls du die Datei lokal nutzt, fehlt der API-Key im Code).";
+            }
+        }
+
+        async function generateStory() {
+            const btn = document.getElementById('storyBtn');
+            const container = document.getElementById('aiStoryContainer');
+            const textEl = document.getElementById('aiStoryText');
+            
+            btn.disabled = true;
+            btn.innerHTML = '<span class="spinner"></span> Lade...';
+            
+            const prompt = "Schreibe eine sehr kurze, lebendige Geschichte (max. 100 Wörter) aus der Sicht eines 12-jährigen Jungen, der 1670 in einer Pariser Spiegel-Manufaktur arbeitet. Beschreibe den Lärm, die Hitze, die strengen Aufseher und den Stolz auf die schönen Spiegel für den König.";
+            const system = "Du bist ein Jugendbuchautor für historische Romane. Schreibe spannend und emotional für 7.-Klässler.";
+            
+            const story = await fetchAI(prompt, system);
+            
+            textEl.innerHTML = story.replace(/\n/g, '<br>');
+            container.classList.remove('hidden');
+            
+            btn.disabled = false;
+            btn.innerHTML = '<i class="fas fa-magic mr-1"></i> Story-Modus';
+        }
+
+        async function getAIFeedback() {
+            const input = document.getElementById('task6Input').value;
+            const btn = document.getElementById('aiFeedbackBtn');
+            const responseEl = document.getElementById('aiFeedbackResponse');
+            
+            if (!input.trim()) {
+                alert("Bitte schreibe erst etwas in das Textfeld!");
+                return;
+            }
+
+            btn.disabled = true;
+            btn.innerHTML = '<span class="spinner"></span> Prüfe...';
+            responseEl.classList.remove('hidden');
+            responseEl.innerText = "Die KI liest deinen Text...";
+            
+            const prompt = `Ein Schüler (7. Klasse) antwortet auf die Frage: 'Wer waren die Verlierer des Merkantilismus?'. Antwort: "${input}". 
+            Bewerte die Antwort. Ist sie historisch korrekt? (Erwartung: Bauern litten, niedrige Lebensmittelpreise, hohe Steuern). Gib kurzes, freundliches Feedback (max 3 Sätze) und einen Verbesserungstipp.`;
+            const system = "Du bist eine motivierende Geschichtslehrerin.";
+
+            const feedback = await fetchAI(prompt, system);
+            
+            responseEl.innerHTML = `<strong><i class="fas fa-robot"></i> Feedback:</strong><br>${feedback}`;
+            
+            btn.disabled = false;
+            btn.innerHTML = '<i class="fas fa-robot mr-2"></i> KI-Feedback';
+        }
+
+        // --- STANDARD FUNCTIONS ---
+
+        function changeLevel(lvl) {
+            currentLevel = lvl;
+            document.querySelectorAll('.level-btn').forEach(b => b.classList.remove('level-active', 'border-blue-600'));
+            document.getElementById('btn-' + lvl).classList.add('level-active', 'border-blue-600');
+            renderAll();
+        }
+
+        function renderAll() {
+            renderGlossary();
+            renderTask1();
+            renderQuiz();
+            renderTask3();
+            renderTask4();
+        }
+
+        function renderGlossary() {
+            const container = document.getElementById('glossaryContent');
+            const terms = content.glossary[currentLevel];
+            container.innerHTML = Object.entries(terms).map(([k, v]) => `
+                <div class="bg-gray-50 p-3 rounded border">
+                    <strong class="text-blue-900 block">${k}</strong>
+                    <span class="text-slate-600">${v}</span>
+                </div>
+            `).join('');
+        }
+
+        function renderTask1() {
+            document.getElementById('textTask').innerHTML = content.task1[currentLevel];
+        }
+
+        function checkTask1(el, correct) {
+            const val = el.value.trim().toLowerCase();
+            const corr = correct.toLowerCase();
+            if (val.includes(corr.substring(0, 3))) { 
+                el.classList.add('correct');
+                el.classList.remove('wrong');
+            } else if (val !== "") {
+                el.classList.add('wrong');
+                el.classList.remove('correct');
+            }
+        }
+
+        function renderQuiz() {
+            const container = document.getElementById('quizContainer');
+            const questions = content.quiz[currentLevel];
+            let html = '';
+            
+            questions.forEach((q, idx) => {
+                const id = `q${idx}`;
+                html += `
+                <div class="bg-indigo-50 p-4 rounded-lg border border-indigo-100 transition hover:shadow-md" id="${id}">
+                    <p class="font-bold text-slate-800 mb-2">${q.q}</p>
+                    <div class="grid grid-cols-1 gap-2">
+                        <button onclick="solveQuiz('${id}', true, this)" class="quiz-option text-left bg-white p-3 rounded border hover:bg-indigo-100 shadow-sm flex justify-between items-center">${q.correct}</button>
+                        ${q.wrong.map(w => `<button onclick="solveQuiz('${id}', false, this)" class="quiz-option text-left bg-white p-3 rounded border hover:bg-indigo-100 shadow-sm flex justify-between items-center">${w}</button>`).join('')}
+                    </div>
+                </div>`;
+            });
+            container.innerHTML = html;
+        }
+
+        function solveQuiz(id, isCorrect, btn) {
+            const parent = document.getElementById(id);
+            const buttons = parent.querySelectorAll('button');
+            buttons.forEach(b => b.disabled = true);
+            
+            if(isCorrect) {
+                btn.classList.add('correct');
+                btn.innerHTML += '<i class="fas fa-check"></i>';
+            } else {
+                btn.classList.add('wrong');
+                btn.innerHTML += '<i class="fas fa-times"></i>';
+            }
+        }
+
+        function renderTask3() {
+            const container = document.getElementById('matchingTask');
+            const items = content.task3[currentLevel];
+            let html = '';
+            items.forEach((item, idx) => {
+                html += `
+                <div class="flex flex-col md:flex-row items-start md:items-center gap-2 bg-slate-50 p-3 rounded border shadow-sm">
+                    <div class="flex-1 font-semibold text-blue-800">${item.q}</div>
+                    <div class="hidden md:block text-slate-400"><i class="fas fa-arrow-right"></i></div>
+                    <div class="flex-1 w-full">
+                        <select onchange="checkMatch(this, '${idx}')" class="w-full bg-white border border-slate-300 rounded p-2 text-sm shadow-sm" data-correct="${item.a}">
+                            <option value="">Wähle...</option>
+                            ${shuffleArray(items.map(i => i.a)).map(ans => `<option value="${ans}">${ans}</option>`).join('')}
+                        </select>
+                    </div>
+                </div>`;
+            });
+            container.innerHTML = html;
+        }
+
+        function shuffleArray(array) {
+            return array.sort(() => Math.random() - 0.5);
+        }
+
+        function checkMatch(el) {
+            if (el.value === el.dataset.correct) {
+                el.classList.add('correct');
+                el.classList.remove('wrong');
+            } else {
+                el.classList.add('wrong');
+                el.classList.remove('correct');
+            }
+        }
+
+        // Updated Render Task 4 with Dropdowns
+        function renderTask4() {
+            const container = document.getElementById('errorTask');
+            const rawText = content.task4[currentLevel];
+            
+            // Regex to find [wrong|right] pattern
+            // Replaces with a select box
+            const html = rawText.replace(/\[(.*?)\|(.*?)\]/g, (match, wrong, right) => {
+                // Randomize order of wrong/right in dropdown
+                const options = Math.random() > 0.5 ? [wrong, right] : [right, wrong];
+                return `<select onchange="checkErrorDropdown(this, '${right}')" class="inline-block bg-red-100 border-b-2 border-red-400 text-red-900 font-semibold mx-1 rounded px-2 py-1 cursor-pointer focus:outline-none focus:border-red-600 transition-colors">
+                            <option value="">???</option>
+                            <option value="${options[0]}">${options[0]}</option>
+                            <option value="${options[1]}">${options[1]}</option>
+                        </select>`;
+            });
+            
+            container.innerHTML = html;
+        }
+
+        function checkErrorDropdown(el, correctVal) {
+            if (el.value === correctVal) {
+                el.classList.remove('bg-red-100', 'border-red-400', 'text-red-900');
+                el.classList.add('bg-green-100', 'border-green-500', 'text-green-800');
+            } else if (el.value !== "") {
+                el.classList.add('bg-red-100', 'border-red-400', 'text-red-900');
+                el.classList.remove('bg-green-100', 'border-green-500', 'text-green-800');
+            }
+        }
+
+        function checkDiagram(el, correct) {
+            if (el.value === correct) {
+                el.classList.add('correct');
+                el.classList.remove('wrong');
+                el.disabled = true; 
+            } else {
+                el.classList.add('wrong');
+            }
+        }
+
+        function toggleHint() {
+            document.getElementById('task6Hint').classList.toggle('hidden');
+        }
+        
+        function toggleTask4Hint() {
+            document.getElementById('task4Hint').classList.toggle('hidden');
+        }
+
+        function toggleSolution4() {
+            const container = document.getElementById('task4Solution');
+            const textContainer = document.getElementById('solutionText');
+            
+            // Generate clean text from the current level's data
+            // Replace [wrong|right] with <span class="font-bold text-green-700">right</span>
+            let cleanText = content.task4[currentLevel].replace(/\[(.*?)\|(.*?)\]/g, (match, wrong, right) => {
+                return `<span class="font-bold text-green-700 bg-green-100 px-1 rounded">${right}</span>`;
+            });
+            
+            textContainer.innerHTML = cleanText;
+            container.classList.remove('hidden');
+        }
+
+        // Init
+        window.onload = () => {
+            changeLevel('MSA');
+        };
+    </script>
+</body>
+</html>

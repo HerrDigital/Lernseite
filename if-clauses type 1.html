@@ -1,0 +1,1223 @@
+<!doctype html>
+<html lang="de">
+<head>
+  <meta charset="utf-8" />
+  <meta name="viewport" content="width=device-width,initial-scale=1" />
+  <title>If-Clauses Type 1 – Digitales Übungsdashboard (Kl. 7)</title>
+
+  <style>
+    :root{
+      --bg:#f4f6f8;
+      --panel:#ffffff;
+      --panel2:#f0f2f4;
+      --text:#1b2430;
+      --muted:#5b6674;
+      --line:#d7dde3;
+
+      --petrol:#167d7f;
+      --petrolSoft:#e7f4f4;
+      --petrolSoft2:#d6eeee;
+
+      --ok:#1f9d55;
+      --okBg:#e8f7ee;
+
+      --bad:#d62839;
+      --badBg:#fdecee;
+
+      --shadow: 0 8px 20px rgba(17, 34, 51, .08);
+      --radius:16px;
+
+      --mono: ui-monospace, SFMono-Regular, Menlo, Monaco, Consolas, "Liberation Mono", "Courier New", monospace;
+      --sans: system-ui, -apple-system, Segoe UI, Roboto, Arial, sans-serif;
+    }
+
+    *{box-sizing:border-box}
+    body{
+      margin:0;
+      font-family:var(--sans);
+      color:var(--text);
+      background: linear-gradient(180deg, #ffffff 0%, var(--bg) 55%);
+      min-height:100vh;
+    }
+
+    header{
+      max-width:1160px;
+      margin:0 auto;
+      padding:18px 18px 8px;
+      display:flex;
+      gap:14px;
+      flex-wrap:wrap;
+      align-items:center;
+      justify-content:space-between;
+    }
+
+    .title{display:flex;flex-direction:column;gap:4px;}
+    h1{margin:0;font-size:22px;letter-spacing:.2px;}
+    .sub{margin:0;color:var(--muted);font-size:13px;line-height:1.35}
+
+    .toolbar{
+      display:flex;
+      gap:10px;
+      align-items:center;
+      flex-wrap:wrap;
+      background:var(--panel);
+      border:1px solid var(--line);
+      padding:10px 12px;
+      border-radius:999px;
+      box-shadow:var(--shadow);
+    }
+
+    .header-right{
+      display:flex;
+      align-items:center;
+      gap:10px;
+      flex-wrap:wrap;
+      justify-content:flex-end;
+    }
+
+    .brand-logo{height:34px;width:auto;opacity:.65;filter:saturate(0.95);}
+    @media (max-width:600px){.brand-logo{height:30px;opacity:.55;}}
+
+    label{font-size:13px;color:var(--muted);}
+
+    select, input[type="text"], textarea{
+      background:var(--panel2);
+      border:1px solid var(--line);
+      color:var(--text);
+      padding:9px 10px;
+      border-radius:10px;
+      outline:none;
+    }
+    select{cursor:pointer}
+
+    main{max-width:1160px;margin:0 auto;padding:10px 18px 34px;}
+    .grid{display:grid;grid-template-columns:1.25fr .75fr;gap:16px;}
+    @media (max-width:980px){.grid{grid-template-columns:1fr}}
+
+    .card{
+      background:var(--panel);
+      border:1px solid var(--line);
+      border-radius:var(--radius);
+      box-shadow:var(--shadow);
+      padding:16px;
+    }
+    .card h2{margin:0 0 10px;font-size:16px}
+    .card h3{margin:0 0 8px;font-size:14px;color:var(--muted);font-weight:700}
+
+    .row{display:flex;gap:10px;flex-wrap:wrap;align-items:center}
+
+    .btn{
+      border:1px solid var(--line);
+      background:var(--panel);
+      color:var(--text);
+      padding:9px 12px;
+      border-radius:12px;
+      cursor:pointer;
+      transition:.15s transform,.15s background;
+      font-size:13px;
+      text-decoration:none;
+      display:inline-flex;
+      align-items:center;
+      justify-content:center;
+      gap:8px;
+      font-weight:800;
+      white-space:nowrap;
+    }
+    .btn:hover{transform:translateY(-1px)}
+    .btn.primary{background:var(--petrol);border-color:var(--petrol);color:#fff;}
+    .btn.secondary{background:var(--petrolSoft);border-color:var(--petrolSoft2);color:var(--petrol);box-shadow:none;}
+    .btn.ghost{background:transparent}
+    .btn.disabled{opacity:.55;cursor:not-allowed;box-shadow:none;}
+
+    .pill{
+      display:inline-flex;
+      align-items:center;
+      gap:8px;
+      padding:7px 10px;
+      border-radius:999px;
+      background:var(--petrolSoft);
+      border:1px solid var(--petrolSoft2);
+      color:var(--petrol);
+      font-size:12px;
+      margin-right:8px;
+      margin-bottom:8px;
+      font-weight:800;
+    }
+
+    .hr{height:1px;background:var(--line);margin:14px 0}
+
+    .score{
+      display:flex;
+      gap:12px;
+      flex-wrap:wrap;
+      align-items:center;
+      justify-content:space-between;
+      background: linear-gradient(180deg, var(--petrolSoft) 0%, #fff 70%);
+      border:1px solid var(--line);
+      border-radius:16px;
+      padding:12px 14px;
+    }
+
+    .tag{
+      padding:3px 10px;
+      border-radius:999px;
+      border:1px solid var(--line);
+      background:#fff;
+      font-size:12px;
+      color:var(--muted);
+      font-weight:800;
+    }
+
+    .task{
+      border:1px solid var(--line);
+      border-radius:16px;
+      padding:14px;
+      background:#fff;
+      margin-top:12px;
+    }
+
+    .task-header{
+      display:flex;
+      gap:10px;
+      justify-content:space-between;
+      align-items:flex-start;
+      flex-wrap:wrap;
+      margin-bottom:10px;
+    }
+
+    .task-title{font-weight:950;font-size:14px}
+    .task-desc{color:var(--muted);font-size:13px;margin:6px 0 0;line-height:1.35}
+
+    .q{padding:12px 0;border-top:1px dashed var(--line);}
+    .q:first-child{border-top:none;padding-top:0}
+
+    .small{font-size:12px;color:var(--muted);line-height:1.4}
+    .mono{font-family:var(--mono)}
+
+    .feedback{
+      margin-top:10px;
+      padding:10px 12px;
+      border-radius:14px;
+      border:1px solid var(--line);
+      background:var(--panel2);
+      font-size:13px;
+      color:var(--muted);
+      line-height:1.35;
+    }
+    .hidden{display:none !important}
+
+    input.correct, textarea.correct, select.correct{
+      border-color: rgba(31,157,85,.55) !important;
+      background: var(--okBg) !important;
+    }
+    input.wrong, textarea.wrong, select.wrong{
+      border-color: rgba(214,40,57,.55) !important;
+      background: var(--badBg) !important;
+    }
+
+    .okTxt{color:var(--ok);font-weight:950}
+
+    .sectionHint{
+      display:flex;
+      align-items:flex-start;
+      justify-content:space-between;
+      gap:10px;
+      flex-wrap:wrap;
+      margin-top:8px;
+    }
+    .count{font-size:12px;color:var(--muted);font-weight:800}
+
+    /* Buttons under each task: right aligned, consistent */
+    .task-actions{
+      margin-top:12px;
+      display:flex;
+      justify-content:flex-end;
+      gap:10px;
+      flex-wrap:wrap;
+    }
+
+    /* Multiple Choice */
+    .mcItem{padding:10px 0;border-top:1px dashed var(--line);}
+    .mcItem:first-child{border-top:none;padding-top:0}
+    .mcStem{font-weight:800;margin-bottom:8px}
+    .mcOpts{display:grid;gap:8px}
+    .mcOpt{
+      display:flex;gap:10px;align-items:flex-start;
+      padding:10px;
+      border:1px solid var(--line);
+      border-radius:12px;
+      background:#fff;
+      cursor:pointer;
+      transition:.12s transform,.12s background;
+    }
+    .mcOpt:hover{transform:translateY(-1px);background:var(--petrolSoft)}
+    .mcOpt input{margin-top:3px}
+    .mcOpt.is-correct{border-color:rgba(31,157,85,.35);background:var(--okBg)}
+    .mcOpt.is-wrong{border-color:rgba(214,40,57,.35);background:var(--badBg)}
+
+    /* Share card styling (match dashboard style) */
+    .shareCard{
+      border:1px solid var(--line);
+      border-radius:16px;
+      background: linear-gradient(180deg, var(--petrolSoft) 0%, #fff 70%);
+      padding:14px;
+    }
+    .shareTop{
+      display:flex;align-items:center;justify-content:space-between;gap:10px;flex-wrap:wrap;
+      margin-bottom:10px;
+    }
+    .shareTitle{font-weight:950;font-size:14px;margin:0}
+    .shareDesc{margin:0;color:var(--muted);font-size:12px;line-height:1.35}
+    .qrWrap{
+      width:120px;height:120px;
+      border-radius:14px;
+      border:1px solid var(--line);
+      background: #fff;
+      padding:8px;
+      display:flex;align-items:center;justify-content:center;
+    }
+    .qrWrap img{width:100%;height:100%;border-radius:10px;display:block}
+    .linkBox{
+      border:1px solid var(--line);
+      background:#fff;
+      border-radius:12px;
+      padding:10px;
+      font-size:12px;
+      color:var(--muted);
+      word-break:break-all;
+    }
+
+    /* Confetti */
+    .confetti{
+      position:fixed;
+      font-size:24px;
+      user-select:none;
+      pointer-events:none;
+      z-index:9999;
+      animation: flyUp 2.6s ease-out forwards;
+    }
+    @keyframes flyUp{
+      0%{transform:translateY(0) rotate(0deg);opacity:1}
+      100%{transform:translateY(-520px) rotate(720deg);opacity:0}
+    }
+
+    /* Intro is OFF */
+    #intro{display:none !important;}
+  </style>
+</head>
+
+<body>
+<header>
+  <div class="title">
+    <h1>If-Clauses Type 1 – Digitales Übungsdashboard</h1>
+    <p class="sub">Übersichtlich · 3 Niveaustufen · Selbstkontrolle · korrekte Antworten werden petrol/grün markiert</p>
+  </div>
+
+  <div class="header-right">
+    <div class="toolbar" role="region" aria-label="Einstellungen">
+      <a class="btn secondary" href="../index.html" title="Zur Übersicht">↩︎ Zurück zur Übersicht</a>
+
+      <label for="level">Niveau:</label>
+      <select id="level">
+        <option value="1">Niveau 1 (leicht)</option>
+        <option value="2" selected>Niveau 2 (Standard)</option>
+        <option value="3">Niveau 3 (anspruchsvoll)</option>
+      </select>
+
+      <button class="btn ghost" id="btnSave" title="Speichern">💾 Speichern</button>
+      <button class="btn ghost" id="btnReset">↩︎ Zurücksetzen</button>
+    </div>
+
+    <img class="brand-logo"
+         src="https://i.ibb.co/M5NS6qnJ/Chat-GPT-Image-24-Nov-2025-15-48-13.png"
+         alt="Herr Digital Logo" />
+  </div>
+</header>
+
+<main>
+  <!-- Intro is disabled by default -->
+  <section id="intro" class="card" aria-label="Intro (aus)">
+    <h2>Intro</h2>
+    <div class="feedback">Dieses Intro ist deaktiviert (Intro aus).</div>
+  </section>
+
+  <div class="grid">
+    <section class="card" aria-label="Aufgabenbereich">
+
+      <div class="score" aria-label="Übersicht">
+        <div>
+          <strong>Dein Stand:</strong>
+          <div class="small">Bearbeite die Aufgaben → klicke <span class="mono">Prüfen</span> → korrekte Antworten werden farbig markiert.</div>
+        </div>
+        <div class="row">
+          <span class="tag">Punkte: <span id="points">0</span>/<span id="maxPoints">0</span></span>
+          <span class="tag">Erfolg: <span id="percent">0</span>%</span>
+        </div>
+      </div>
+
+      <!-- Merkkasten -->
+      <div class="task" id="task0">
+        <div class="task-header">
+          <div>
+            <div class="task-title">Merkkasten</div>
+            <div class="task-desc">
+              Type 1: <span class="mono">If + Present Simple</span> + Komma + <span class="mono">will / can / must + base verb</span>
+              <br><strong>Wichtig:</strong> Niemals <span class="mono">will</span> im If-Satz!
+            </div>
+          </div>
+          <div class="row">
+            <button class="btn ghost" data-action="toggleHelp" data-target="help0">Merkkasten anzeigen</button>
+          </div>
+        </div>
+        <div id="help0" class="feedback hidden">
+          <div>
+            <span class="pill">If-Satz: Present Simple</span>
+            <span class="pill">Main clause: will/can/must + base</span>
+            <span class="pill">he/she/it: -s</span>
+            <span class="pill">If vorne → Komma</span>
+          </div>
+          <div class="hr"></div>
+          <div class="small">
+            Beispiele (Alltagssprache):<br>
+            <span class="mono">If it rains, I will stay inside.</span><br>
+            <span class="mono">I will call you if I have time.</span>
+          </div>
+        </div>
+      </div>
+
+      <!-- Aufgabe 1 -->
+      <div class="task" id="task1">
+        <div class="task-header">
+          <div>
+            <div class="task-title">Aufgabe 1: Aussagen – der richtige Satz (10)</div>
+            <div class="task-desc">Wähle pro Nummer den korrekten Type-1-Satz. Achte besonders auf <span class="mono">kein will im If-Satz</span> und auf <span class="mono">he/she/it + -s</span>.</div>
+          </div>
+        </div>
+
+        <div class="q" data-level="1" id="t1_l1"></div>
+        <div class="q" data-level="2" id="t1_l2"></div>
+        <div class="q" data-level="3" id="t1_l3"></div>
+
+        <div id="fb1" class="feedback hidden"></div>
+        <div class="task-actions">
+          <button class="btn primary" data-action="check" data-task="1">Prüfen</button>
+          <button class="btn" data-action="solution" data-task="1">Musterlösung</button>
+        </div>
+      </div>
+
+      <!-- Aufgabe 2 -->
+      <div class="task" id="task2">
+        <div class="task-header">
+          <div>
+            <div class="task-title">Aufgabe 2: Lücken – Present Simple oder will? (10)</div>
+            <div class="task-desc">Ergänze die Lücke. Das Verb steht in Grundform in Klammern. Tipp: If-Teil = Present Simple · Hauptsatz = <span class="mono">will + base</span> (oder <span class="mono">can/must</span>).</div>
+          </div>
+        </div>
+        <div class="sectionHint">
+          <div class="small">Achte auf: <span class="mono">do/does</span>, <span class="mono">don’t/doesn’t</span>, <span class="mono">he/she/it + -s</span>, Komma-Regel.</div>
+          <div class="count">10 Items</div>
+        </div>
+
+        <div class="q" data-level="1" id="t2_l1"></div>
+        <div class="q" data-level="2" id="t2_l2"></div>
+        <div class="q" data-level="3" id="t2_l3"></div>
+
+        <div id="fb2" class="feedback hidden"></div>
+        <div class="task-actions">
+          <button class="btn primary" data-action="check" data-task="2">Prüfen</button>
+          <button class="btn" data-action="solution" data-task="2">Musterlösung</button>
+        </div>
+      </div>
+
+      <!-- Aufgabe 3 -->
+      <div class="task" id="task3">
+        <div class="task-header">
+          <div>
+            <div class="task-title">Aufgabe 3: Verneinungen (10)</div>
+            <div class="task-desc">Schreibe den Satz als Verneinung. Tipp: If-Teil mit <span class="mono">don’t/doesn’t</span> · Hauptsatz mit <span class="mono">won’t</span>. (Bei <span class="mono">must</span> → <span class="mono">mustn’t</span>.)</div>
+          </div>
+        </div>
+
+        <div class="q" data-level="1" id="t3_l1"></div>
+        <div class="q" data-level="2" id="t3_l2"></div>
+        <div class="q" data-level="3" id="t3_l3"></div>
+
+        <div id="fb3" class="feedback hidden"></div>
+        <div class="task-actions">
+          <button class="btn primary" data-action="check" data-task="3">Prüfen</button>
+          <button class="btn" data-action="solution" data-task="3">Musterlösung</button>
+        </div>
+      </div>
+
+      <!-- Aufgabe 4 -->
+      <div class="task" id="task4">
+        <div class="task-header">
+          <div>
+            <div class="task-title">Aufgabe 4: Fragen bilden (10)</div>
+            <div class="task-desc">Forme eine Frage. Achte auf die Wortstellung (z. B. <span class="mono">Will you…?</span> / <span class="mono">Can you…?</span> / <span class="mono">Must you…?</span>).</div>
+          </div>
+        </div>
+        <div class="sectionHint">
+          <div class="small">Wenn If-Satz hinten steht, kommt meistens <strong>kein Komma</strong>.</div>
+          <div class="count">10 Items</div>
+        </div>
+
+        <div class="q" data-level="1" id="t4_l1"></div>
+        <div class="q" data-level="2" id="t4_l2"></div>
+        <div class="q" data-level="3" id="t4_l3"></div>
+
+        <div id="fb4" class="feedback hidden"></div>
+        <div class="task-actions">
+          <button class="btn primary" data-action="check" data-task="4">Prüfen</button>
+          <button class="btn" data-action="solution" data-task="4">Musterlösung</button>
+        </div>
+      </div>
+
+      <!-- Aufgabe 5 -->
+      <div class="task" id="task5">
+        <div class="task-header">
+          <div>
+            <div class="task-title">Aufgabe 5: Mixed Forms – beide Teile einsetzen (10)</div>
+            <div class="task-desc">Fülle <strong>beide</strong> Lücken aus: If-Teil (Present Simple) + Hauptsatz (will/can/must + base). Komma nur, wenn der If-Satz vorne steht.</div>
+          </div>
+        </div>
+
+        <div class="q" data-level="1" id="t5_l1"></div>
+        <div class="q" data-level="2" id="t5_l2"></div>
+        <div class="q" data-level="3" id="t5_l3"></div>
+
+        <div id="fb5" class="feedback hidden"></div>
+        <div class="task-actions">
+          <button class="btn primary" data-action="check" data-task="5">Prüfen</button>
+          <button class="btn" data-action="solution" data-task="5">Musterlösung</button>
+        </div>
+      </div>
+
+    </section>
+
+    <!-- Sidebar -->
+    <aside class="card" aria-label="Schnellhilfe">
+      <h2>Schnellhilfe</h2>
+      <div class="pill">Type 1: real/possible</div>
+      <div class="pill">If: Present Simple</div>
+      <div class="pill">Main: will + base</div>
+      <div class="pill">Nie „will“ im If</div>
+
+      <div class="hr"></div>
+      <h3>Dashboard-Steuerung</h3>
+      <div class="row">
+        <button class="btn" id="btnCheckAll">Alles prüfen</button>
+        <button class="btn ghost" id="btnShowAll">Alle Lösungen anzeigen</button>
+      </div>
+
+      <div class="hr"></div>
+      <div class="feedback">
+        <strong>Hinweis:</strong> Eingaben werden lokal im Browser gespeichert (<span class="mono">localStorage</span>).
+      </div>
+
+      <div class="hr"></div>
+      <h3>Schnellzugriff & Teilen</h3>
+
+      <div class="shareCard" style="margin-top:10px;">
+        <div class="shareTop">
+          <div>
+            <div class="shareTitle">Link für die Klasse</div>
+            <p class="shareDesc">QR scannen oder Link kopieren (führt zu diesem Dashboard).</p>
+          </div>
+        </div>
+
+        <div style="display:grid;grid-template-columns:120px 1fr;gap:12px;align-items:center;">
+          <div class="qrWrap" aria-label="QR-Code Rahmen">
+            <img id="qrImg" alt="QR-Code zum Dashboard">
+          </div>
+
+          <div>
+            <div class="tag" style="display:inline-flex;margin-bottom:8px;">Dashboard-Link</div>
+            <div class="linkBox" id="shareLink"></div>
+            <div class="row" style="margin-top:10px;">
+              <button class="btn secondary" id="btnShare">Teilen</button>
+              <button class="btn" id="btnCopy">Link kopieren</button>
+            </div>
+            <div class="small" id="copyStatus" style="margin-top:8px;"></div>
+          </div>
+        </div>
+      </div>
+
+      <div class="hr"></div>
+      <h3>Merktipp</h3>
+      <div class="feedback">
+        <div><strong>Komma:</strong> <span class="mono">If …, …</span> ✓ · <span class="mono">…, if …</span> meistens ohne Komma ✓</div>
+        <div class="small" style="margin-top:6px;"><strong>He/She/It:</strong> Present Simple mit <span class="mono">-s</span> (z. B. <span class="mono">if he arrives</span>).</div>
+      </div>
+    </aside>
+
+  </div>
+</main>
+
+<script>
+/* =========================================================
+   MASTER SETTINGS
+========================================================= */
+const DASH = {
+  storageKey: "if_type1_dashboard_master_v1",
+  fallbackPath: "/dashboards/if-clauses-type-1.html"
+};
+
+/* =========================================================
+   CONTENT (Type 1 ONLY) – 5 tasks, 10 items each level
+========================================================= */
+const CONTENT = {
+  meta:{ title:"If-Clauses Type 1" },
+  tasks:[
+    /* 1) MC */
+    {
+      id:1, type:"mc",
+      pointsPerLevel:{1:10,2:10,3:10},
+      levels:{
+        1:[
+          {stem:"Wähle den korrekten Satz.", options:["If it rains, I will stay inside.","If it will rain, I stay inside."], sol:"If it rains, I will stay inside."},
+          {stem:"Wähle den korrekten Satz.", options:["I will call you if I have time.","I will call you if I will have time."], sol:"I will call you if I have time."},
+          {stem:"Wähle den korrekten Satz.", options:["If she studies, she will pass the test.","If she will study, she will pass the test."], sol:"If she studies, she will pass the test."},
+          {stem:"Wähle den korrekten Satz.", options:["We will leave if the bus arrives.","We will leave if the bus will arrive."], sol:"We will leave if the bus arrives."},
+          {stem:"Wähle den korrekten Satz.", options:["If you are late, you will miss the start.","If you will be late, you miss the start."], sol:"If you are late, you will miss the start."},
+          {stem:"Wähle den korrekten Satz.", options:["He will help if he has time.","He will help if he will have time."], sol:"He will help if he has time."},
+          {stem:"Wähle den korrekten Satz.", options:["If the battery is low, I will charge it.","If the battery will be low, I charge it."], sol:"If the battery is low, I will charge it."},
+          {stem:"Wähle den korrekten Satz.", options:["They will wait if the teacher is late.","They will wait if the teacher will be late."], sol:"They will wait if the teacher is late."},
+          {stem:"Wähle den korrekten Satz.", options:["If you listen carefully, you will understand.","If you will listen carefully, you understand."], sol:"If you listen carefully, you will understand."},
+          {stem:"Wähle den korrekten Satz.", options:["I will text you if I arrive early.","I will text you if I will arrive early."], sol:"I will text you if I arrive early."}
+        ],
+        2:[
+          {stem:"He/She/It (+-s).", options:["If he arrive early, we will get seats.","If he arrives early, we will get seats."], sol:"If he arrives early, we will get seats."},
+          {stem:"Verneinung im If-Teil.", options:["If you won't hurry, you will be late.","If you don't hurry, you will be late."], sol:"If you don't hurry, you will be late."},
+          {stem:"Kein will im If-Teil.", options:["If it gets cold, I will wear a jacket.","If it will get cold, I will wear a jacket."], sol:"If it gets cold, I will wear a jacket."},
+          {stem:"If hinten – kein Komma.", options:["We will start, if everyone is ready.","We will start if everyone is ready."], sol:"We will start if everyone is ready."},
+          {stem:"He/She/It check.", options:["If she need help, she will ask the teacher.","If she needs help, she will ask the teacher."], sol:"If she needs help, she will ask the teacher."},
+          {stem:"Don't/doesn't im If-Teil.", options:["If he doesn't practise, he won't improve.","If he won't practise, he won't improve."], sol:"If he doesn't practise, he won't improve."},
+          {stem:"If vorne – Komma.", options:["If we finish early we will go outside.","If we finish early, we will go outside."], sol:"If we finish early, we will go outside."},
+          {stem:"Modal im Hauptsatz.", options:["If you feel sick, you must stay home.","If you feel sick, you must staying home."], sol:"If you feel sick, you must stay home."},
+          {stem:"Richtige Zeitform.", options:["If the app crashes, I restart it.","If the app crashes, I will restart it."], sol:"If the app crashes, I will restart it."},
+          {stem:"If hinten – kein Komma.", options:["I will bring a charger, if my phone dies.","I will bring a charger if my phone dies."], sol:"I will bring a charger if my phone dies."}
+        ],
+        3:[
+          {stem:"He/She/It (+-s).", options:["If the train arrive late, we will change the plan.","If the train arrives late, we will change the plan."], sol:"If the train arrives late, we will change the plan."},
+          {stem:"Kein will im If-Teil.", options:["If the file will not save, we will lose work.","If the file doesn't save, we will lose work."], sol:"If the file doesn't save, we will lose work."},
+          {stem:"Modal + base.", options:["If you want a good grade, you must practise regularly.","If you want a good grade, you must practising regularly."], sol:"If you want a good grade, you must practise regularly."},
+          {stem:"Imperativ möglich.", options:["If you see an error, click the button.","If you see an error, you will click the button."], sol:"If you see an error, click the button."},
+          {stem:"If hinten korrekt?", options:["We will continue if the weather improves.","We will continue if the weather will improve."], sol:"We will continue if the weather improves."},
+          {stem:"Doesn't statt don't.", options:["If he don't know the answer, he will guess.","If he doesn't know the answer, he will guess."], sol:"If he doesn't know the answer, he will guess."},
+          {stem:"Komma bei If vorne.", options:["If you press the icon, the app will open.","If you press the icon the app will open."], sol:"If you press the icon, the app will open."},
+          {stem:"Aussage (nicht Frage).", options:["If you need help, you can call me.","If you need help, can you call me."], sol:"If you need help, you can call me."},
+          {stem:"Kein will im If-Teil.", options:["I will email you if I have enough information.","I will email you if I will have enough information."], sol:"I will email you if I have enough information."},
+          {stem:"He/She/It + -s.", options:["If she study more, she will feel confident.","If she studies more, she will feel confident."], sol:"If she studies more, she will feel confident."}
+        ]
+      }
+    },
+
+    /* 2) INPUT */
+    {
+      id:2, type:"input",
+      pointsPerLevel:{1:10,2:10,3:10},
+      levels:{
+        1:[
+          {stem:"If it ________ (rain), I will stay inside.", sol:"rains"},
+          {stem:"We will go outside if the sun ________ (shine).", sol:"shines"},
+          {stem:"If you ________ (be) late, you will miss the start.", sol:"are"},
+          {stem:"I ________ (call) you if I have time.", sol:"will call"},
+          {stem:"If she ________ (study), she will pass.", sol:"studies"},
+          {stem:"They will wait if the teacher ________ (be) late.", sol:"is"},
+          {stem:"If we finish early, we ________ (walk) home.", sol:"will walk"},
+          {stem:"He ________ (help) you if he has time.", sol:"will help"},
+          {stem:"If you ________ (listen), you will understand.", sol:"listen"},
+          {stem:"I will text you if I ________ (arrive) early.", sol:"arrive"}
+        ],
+        2:[
+          {stem:"If we ________ (not/hurry), we will be late.", sol:"don't hurry"},
+          {stem:"If he ________ (not/practise), he won't improve.", sol:"doesn't practise"},
+          {stem:"If it gets cold, I ________ (wear) a jacket.", sol:"will wear"},
+          {stem:"We will start if everyone ________ (be) ready.", sol:"is"},
+          {stem:"If she ________ (need) help, she will ask the teacher.", sol:"needs"},
+          {stem:"If the app ________ (crash), I will restart it.", sol:"crashes"},
+          {stem:"If you feel sick, you ________ (stay) home. (must)", sol:"must stay"},
+          {stem:"I will bring a charger if my phone ________ (die).", sol:"dies"},
+          {stem:"If we finish on time, we ________ (play) a game.", sol:"will play"},
+          {stem:"If he ________ (forget) his password, he will reset it.", sol:"forgets"}
+        ],
+        3:[
+          {stem:"If the file ________ (not/save), we will lose our work.", sol:"doesn't save"},
+          {stem:"If you want a good grade, you ________ (practise) regularly. (must)", sol:"must practise"},
+          {stem:"If you see an error, ________ (click) the button. (imperative)", sol:"click"},
+          {stem:"We will continue if the weather ________ (improve).", sol:"improves"},
+          {stem:"If he ________ (not/know) the answer, he will guess.", sol:"doesn't know"},
+          {stem:"If you press the icon, the app ________ (open).", sol:"will open"},
+          {stem:"If you need help, you ________ (call) me. (can)", sol:"can call"},
+          {stem:"I will email you if I ________ (have) enough information.", sol:"have"},
+          {stem:"If she ________ (study) more, she will feel confident.", sol:"studies"},
+          {stem:"If the bus ________ (arrive) late, we will take the next one.", sol:"arrives"}
+        ]
+      }
+    },
+
+    /* 3) VERNEINUNGEN (rewrite) */
+    {
+      id:3, type:"rewrite",
+      pointsPerLevel:{1:10,2:10,3:10},
+      levels:{
+        1:[
+          {stem:"If it rains, I will go outside. → Verneine:", sol:"If it rains, I won't go outside."},
+          {stem:"I will call you if I have time. → Verneine:", sol:"I won't call you if I have time."},
+          {stem:"If she studies, she will pass. → Verneine:", sol:"If she studies, she won't pass."},
+          {stem:"We will leave if the bus arrives. → Verneine:", sol:"We won't leave if the bus arrives."},
+          {stem:"If you are late, you will miss the start. → Verneine:", sol:"If you are late, you won't miss the start."},
+          {stem:"He will help if he has time. → Verneine:", sol:"He won't help if he has time."},
+          {stem:"If the battery is low, I will charge it. → Verneine:", sol:"If the battery is low, I won't charge it."},
+          {stem:"They will wait if the teacher is late. → Verneine:", sol:"They won't wait if the teacher is late."},
+          {stem:"If you listen carefully, you will understand. → Verneine:", sol:"If you listen carefully, you won't understand."},
+          {stem:"I will text you if I arrive early. → Verneine:", sol:"I won't text you if I arrive early."}
+        ],
+        2:[
+          {stem:"If we hurry, we will be late. → Verneine:", sol:"If we hurry, we won't be late."},
+          {stem:"If he practises, he will improve. → Verneine:", sol:"If he practises, he won't improve."},
+          {stem:"If she needs help, she will ask the teacher. → Verneine:", sol:"If she needs help, she won't ask the teacher."},
+          {stem:"We will start if everyone is ready. → Verneine:", sol:"We won't start if everyone is ready."},
+          {stem:"If you feel sick, you must stay home. → Verneine:", sol:"If you feel sick, you mustn't stay home."},
+          {stem:"If the app crashes, I will restart it. → Verneine:", sol:"If the app crashes, I won't restart it."},
+          {stem:"I will bring a charger if my phone dies. → Verneine:", sol:"I won't bring a charger if my phone dies."},
+          {stem:"If he forgets his password, he will reset it. → Verneine:", sol:"If he forgets his password, he won't reset it."},
+          {stem:"If we finish on time, we will play a game. → Verneine:", sol:"If we finish on time, we won't play a game."},
+          {stem:"If you listen, you will understand. → Verneine:", sol:"If you listen, you won't understand."}
+        ],
+        3:[
+          {stem:"If the file saves, we will keep our work. → Verneine:", sol:"If the file saves, we won't keep our work."},
+          {stem:"If you want a good grade, you must practise regularly. → Verneine:", sol:"If you want a good grade, you mustn't practise regularly."},
+          {stem:"If you see an error, click the button. → Verneine:", sol:"If you see an error, don't click the button."},
+          {stem:"We will continue if the weather improves. → Verneine:", sol:"We won't continue if the weather improves."},
+          {stem:"If he knows the answer, he will explain it. → Verneine:", sol:"If he knows the answer, he won't explain it."},
+          {stem:"If you press the icon, the app will open. → Verneine:", sol:"If you press the icon, the app won't open."},
+          {stem:"If you need help, you can call me. → Verneine:", sol:"If you need help, you can't call me."},
+          {stem:"I will email you if I have enough information. → Verneine:", sol:"I won't email you if I have enough information."},
+          {stem:"If she studies more, she will feel confident. → Verneine:", sol:"If she studies more, she won't feel confident."},
+          {stem:"If the bus arrives late, we will take the next one. → Verneine:", sol:"If the bus arrives late, we won't take the next one."}
+        ]
+      }
+    },
+
+    /* 4) FRAGEN */
+    {
+      id:4, type:"question",
+      pointsPerLevel:{1:10,2:10,3:10},
+      levels:{
+        1:[
+          {stem:"If it rains, you will stay inside.", sol:"Will you stay inside if it rains?"},
+          {stem:"If you are late, you will miss the start.", sol:"Will you miss the start if you are late?"},
+          {stem:"If she studies, she will pass the test.", sol:"Will she pass the test if she studies?"},
+          {stem:"We will go outside if the sun shines.", sol:"Will we go outside if the sun shines?"},
+          {stem:"If I have time, I will help you.", sol:"Will you help me if you have time?"},
+          {stem:"He will answer if you call him.", sol:"Will he answer if you call him?"},
+          {stem:"They will get good seats if they arrive early.", sol:"Will they get good seats if they arrive early?"},
+          {stem:"If the battery is low, you will charge the phone.", sol:"Will you charge the phone if the battery is low?"},
+          {stem:"You will understand if you listen carefully.", sol:"Will you understand if you listen carefully?"},
+          {stem:"If I miss the bus, I will take the next one.", sol:"Will you take the next one if you miss the bus?"}
+        ],
+        2:[
+          {stem:"If we don't hurry, we will be late.", sol:"Will we be late if we don't hurry?"},
+          {stem:"She will ask the teacher if she doesn't understand.", sol:"Will she ask the teacher if she doesn't understand?"},
+          {stem:"If you need help, you can call me.", sol:"Can you call me if you need help?"},
+          {stem:"We will start if everyone is ready.", sol:"Will we start if everyone is ready?"},
+          {stem:"If he forgets his password, he must reset it.", sol:"Must he reset it if he forgets his password?"},
+          {stem:"If I have a question, I will ask you.", sol:"Will you ask me if you have a question?"},
+          {stem:"They won't improve if they don't practise.", sol:"Will they improve if they don't practise?"},
+          {stem:"If it gets cold, I will wear a jacket.", sol:"Will you wear a jacket if it gets cold?"},
+          {stem:"The teacher will notice if you don't pay attention.", sol:"Will the teacher notice if you don't pay attention?"},
+          {stem:"If my phone dies, I will use a charger.", sol:"Will you use a charger if your phone dies?"}
+        ],
+        3:[
+          {stem:"If you press this button, the app will start.", sol:"Will the app start if you press this button?"},
+          {stem:"We will lose our work if we don't save the file.", sol:"Will we lose our work if we don't save the file?"},
+          {stem:"If you don't update the app, it might stop working.", sol:"Might it stop working if you don't update the app?"},
+          {stem:"If you want a good grade, you must practise regularly.", sol:"Must you practise regularly if you want a good grade?"},
+          {stem:"If she is busy, she will call later.", sol:"Will she call later if she is busy?"},
+          {stem:"You can choose your seat if you arrive early.", sol:"Can you choose your seat if you arrive early?"},
+          {stem:"If we don't check the time, we will miss the start.", sol:"Will we miss the start if we don't check the time?"},
+          {stem:"People will help you if you ask politely.", sol:"Will people help you if you ask politely?"},
+          {stem:"If the light is red, you must stop.", sol:"Must you stop if the light is red?"},
+          {stem:"If the team wins, they will get a trophy.", sol:"Will they get a trophy if the team wins?"}
+        ]
+      }
+    },
+
+    /* 5) MIXED DOUBLE */
+    {
+      id:5, type:"mixed",
+      pointsPerLevel:{1:10,2:10,3:10},
+      levels:{
+        1:[
+          {stem:"If it ________ (rain), I ________ (stay) inside.", sol1:"rains", sol2:"will stay"},
+          {stem:"We ________ (go) outside if the sun ________ (shine).", sol1:"will go", sol2:"shines"},
+          {stem:"If she ________ (study), she ________ (pass) the test.", sol1:"studies", sol2:"will pass"},
+          {stem:"I ________ (call) you if I ________ (finish) early.", sol1:"will call", sol2:"finish"},
+          {stem:"If you ________ (be) late, you ________ (miss) the start.", sol1:"are", sol2:"will miss"},
+          {stem:"He ________ (help) you if he ________ (have) time.", sol1:"will help", sol2:"has"},
+          {stem:"If they ________ (arrive) early, they ________ (get) good seats.", sol1:"arrive", sol2:"will get"},
+          {stem:"You ________ (understand) if you ________ (listen) carefully.", sol1:"will understand", sol2:"listen"},
+          {stem:"If the battery ________ (be) low, I ________ (charge) it.", sol1:"is", sol2:"will charge"},
+          {stem:"I ________ (take) the bus if I ________ (miss) the train.", sol1:"will take", sol2:"miss"}
+        ],
+        2:[
+          {stem:"If we ________ (not/hurry), we ________ (be) late.", sol1:"don't hurry", sol2:"will be"},
+          {stem:"She ________ (ask) the teacher if she ________ (not/understand).", sol1:"will ask", sol2:"doesn't understand"},
+          {stem:"If he ________ (forget) his password, he ________ (reset) it. (must)", sol1:"forgets", sol2:"must reset"},
+          {stem:"If the app ________ (crash), I ________ (restart) it.", sol1:"crashes", sol2:"will restart"},
+          {stem:"We ________ (start) if everyone ________ (be) ready.", sol1:"will start", sol2:"is"},
+          {stem:"If it ________ (get) cold, I ________ (wear) a jacket.", sol1:"gets", sol2:"will wear"},
+          {stem:"If you ________ (need) help, you ________ (call) me. (can)", sol1:"need", sol2:"can call"},
+          {stem:"They ________ (improve) if they ________ (practise).", sol1:"will improve", sol2:"practise"},
+          {stem:"If my phone ________ (die), I ________ (use) a charger.", sol1:"dies", sol2:"will use"},
+          {stem:"The teacher ________ (notice) if you ________ (not/pay) attention.", sol1:"will notice", sol2:"don't pay"}
+        ],
+        3:[
+          {stem:"If you ________ (press) this button, the app ________ (start).", sol1:"press", sol2:"will start"},
+          {stem:"We ________ (lose) our work if we ________ (not/save) the file.", sol1:"will lose", sol2:"don't save"},
+          {stem:"If you ________ (not/update) the app, it ________ (stop) working. (might)", sol1:"don't update", sol2:"might stop"},
+          {stem:"If you ________ (want) a good grade, you ________ (practise) regularly. (must)", sol1:"want", sol2:"must practise"},
+          {stem:"If she ________ (be) busy, she ________ (call) later.", sol1:"is", sol2:"will call"},
+          {stem:"You ________ (choose) your seat if you ________ (arrive) early. (can)", sol1:"can choose", sol2:"arrive"},
+          {stem:"If we ________ (not/check) the time, we ________ (miss) the start.", sol1:"don't check", sol2:"will miss"},
+          {stem:"People ________ (help) you if you ________ (ask) politely.", sol1:"will help", sol2:"ask"},
+          {stem:"If the light ________ (be) red, you ________ (stop). (must)", sol1:"is", sol2:"must stop"},
+          {stem:"If the team ________ (win), they ________ (get) a trophy.", sol1:"wins", sol2:"will get"}
+        ]
+      }
+    }
+  ]
+};
+
+/* =========================================================
+   RENDERING + LOGIC
+========================================================= */
+const $ = (sel, root=document) => root.querySelector(sel);
+const $$ = (sel, root=document) => Array.from(root.querySelectorAll(sel));
+
+function normalize(s){
+  return (s ?? "")
+    .toString()
+    .trim()
+    .toLowerCase()
+    .replace(/\s+/g," ")
+    .replace(/[“”„"]/g,'"')
+    .replace(/[’‘]/g,"'");
+}
+
+function getLevel(){
+  return parseInt($("#level").value, 10);
+}
+
+function setVisibleLevelBlocks(){
+  const lvl = getLevel();
+  $$('[data-level]').forEach(el=>{
+    el.classList.toggle('hidden', parseInt(el.getAttribute('data-level'),10) !== lvl);
+  });
+}
+
+function buildMC(taskId, mountId, items){
+  const mount = document.getElementById(mountId);
+  mount.innerHTML = "";
+  items.forEach((it, idx)=>{
+    const name = `t${taskId}_q${idx}`;
+    const wrap = document.createElement('div');
+    wrap.className = 'mcItem';
+    wrap.innerHTML = `
+      <div class="mcStem">${idx+1}) ${it.stem}</div>
+      <div class="mcOpts">
+        ${it.options.map(opt=>`
+          <label class="mcOpt">
+            <input type="radio" name="${name}" value="${opt}">
+            <span>${opt}</span>
+          </label>
+        `).join("")}
+      </div>
+    `;
+    mount.appendChild(wrap);
+  });
+}
+
+function buildInput(taskId, mountId, items){
+  const mount = document.getElementById(mountId);
+  mount.innerHTML = "";
+  items.forEach((it, idx)=>{
+    const id = `t${taskId}_q${idx}`;
+    const row = document.createElement('div');
+    row.className = 'q';
+    row.innerHTML = `
+      <div><strong>${idx+1})</strong> ${it.stem}</div>
+      <div style="margin-top:8px">
+        <input type="text" data-id="${id}" placeholder="Antwort ...">
+      </div>
+    `;
+    mount.appendChild(row);
+  });
+}
+
+function buildRewrite(taskId, mountId, items){
+  // gleich wie input (nur anderer Aufgabentyp)
+  buildInput(taskId, mountId, items.map(x=>({stem:x.stem, sol:x.sol})));
+}
+
+function buildQuestion(taskId, mountId, items){
+  buildInput(taskId, mountId, items.map(x=>({stem:x.stem, sol:x.sol})));
+}
+
+function buildMixed(taskId, mountId, items){
+  const mount = document.getElementById(mountId);
+  mount.innerHTML = "";
+  items.forEach((it, idx)=>{
+    const aId = `t${taskId}_q${idx}_a`;
+    const bId = `t${taskId}_q${idx}_b`;
+    const row = document.createElement('div');
+    row.className = 'q';
+    row.innerHTML = `
+      <div><strong>${idx+1})</strong> ${it.stem}</div>
+      <div style="display:flex;gap:10px;flex-wrap:wrap;margin-top:8px">
+        <input type="text" data-id="${aId}" placeholder="Lücke 1">
+        <input type="text" data-id="${bId}" placeholder="Lücke 2">
+      </div>
+    `;
+    mount.appendChild(row);
+  });
+}
+
+function renderAll(){
+  const lvl = getLevel();
+
+  // Task 1
+  buildMC(1, `t1_l1`, CONTENT.tasks[0].levels[1]);
+  buildMC(1, `t1_l2`, CONTENT.tasks[0].levels[2]);
+  buildMC(1, `t1_l3`, CONTENT.tasks[0].levels[3]);
+
+  // Task 2
+  buildInput(2, `t2_l1`, CONTENT.tasks[1].levels[1]);
+  buildInput(2, `t2_l2`, CONTENT.tasks[1].levels[2]);
+  buildInput(2, `t2_l3`, CONTENT.tasks[1].levels[3]);
+
+  // Task 3
+  buildRewrite(3, `t3_l1`, CONTENT.tasks[2].levels[1]);
+  buildRewrite(3, `t3_l2`, CONTENT.tasks[2].levels[2]);
+  buildRewrite(3, `t3_l3`, CONTENT.tasks[2].levels[3]);
+
+  // Task 4
+  buildQuestion(4, `t4_l1`, CONTENT.tasks[3].levels[1]);
+  buildQuestion(4, `t4_l2`, CONTENT.tasks[3].levels[2]);
+  buildQuestion(4, `t4_l3`, CONTENT.tasks[3].levels[3]);
+
+  // Task 5
+  buildMixed(5, `t5_l1`, CONTENT.tasks[4].levels[1]);
+  buildMixed(5, `t5_l2`, CONTENT.tasks[4].levels[2]);
+  buildMixed(5, `t5_l3`, CONTENT.tasks[4].levels[3]);
+
+  setVisibleLevelBlocks();
+  bindInputSave();
+  restoreState();
+  updateScore();
+  setupShare();
+}
+
+function mark(el, ok){
+  el.classList.remove('correct','wrong');
+  el.classList.add(ok ? 'correct' : 'wrong');
+}
+
+function checkTask(taskId){
+  const lvl = getLevel();
+  const task = CONTENT.tasks.find(t=>t.id===taskId);
+  const items = task.levels[lvl];
+  let got = 0;
+  let max = 10;
+
+  // Reset feedback styles for MC labels
+  if(task.type === 'mc'){
+    // For each question, find selected + mark label
+    items.forEach((it, idx)=>{
+      const name = `t${taskId}_q${idx}`;
+      const radios = $$(`input[name="${name}"]`);
+      radios.forEach(r => r.parentElement.classList.remove('is-correct','is-wrong'));
+      const chosen = radios.find(r=>r.checked);
+      const ok = chosen && normalize(chosen.value) === normalize(it.sol);
+      if(ok) got++;
+      if(chosen){
+        chosen.parentElement.classList.add(ok ? 'is-correct' : 'is-wrong');
+      }
+    });
+  }
+  else if(task.type === 'mixed'){
+    items.forEach((it, idx)=>{
+      const a = $(`[data-id="t${taskId}_q${idx}_a"]`);
+      const b = $(`[data-id="t${taskId}_q${idx}_b"]`);
+      const ok1 = normalize(a.value) === normalize(it.sol1);
+      const ok2 = normalize(b.value) === normalize(it.sol2);
+      mark(a, ok1); mark(b, ok2);
+      if(ok1 && ok2) got++;
+    });
+  }
+  else{
+    items.forEach((it, idx)=>{
+      const inp = $(`[data-id="t${taskId}_q${idx}"]`);
+      const ok = normalize(inp.value) === normalize(it.sol);
+      mark(inp, ok);
+      if(ok) got++;
+    });
+  }
+
+  const fb = document.getElementById(`fb${taskId}`);
+  fb.classList.remove('hidden');
+  fb.innerHTML = got === max
+    ? `<span class="okTxt">Perfekt!</span> ${got}/${max} ✓`
+    : `Ergebnis: <strong>${got}/${max}</strong>`;
+
+  if(got === max) fireConfetti();
+  pointsByTask[taskId] = got;
+  updateScore();
+  saveState();
+}
+
+function showSolution(taskId){
+  const lvl = getLevel();
+  const task = CONTENT.tasks.find(t=>t.id===taskId);
+  const items = task.levels[lvl];
+
+  if(task.type === 'mc'){
+    items.forEach((it, idx)=>{
+      const name = `t${taskId}_q${idx}`;
+      const radios = $$(`input[name="${name}"]`);
+      radios.forEach(r=>{
+        if(normalize(r.value) === normalize(it.sol)){
+          r.checked = true;
+          r.dispatchEvent(new Event('change',{bubbles:true}));
+        }
+      });
+    });
+  }
+  else if(task.type === 'mixed'){
+    items.forEach((it, idx)=>{
+      $(`[data-id="t${taskId}_q${idx}_a"]`).value = it.sol1;
+      $(`[data-id="t${taskId}_q${idx}_b"]`).value = it.sol2;
+    });
+  }
+  else{
+    items.forEach((it, idx)=>{
+      $(`[data-id="t${taskId}_q${idx}"]`).value = it.sol;
+    });
+  }
+
+  // Do not auto-check; just fill in
+  bindInputSave();
+  saveState();
+}
+
+function bindButtons(){
+  // Merkkasten toggle
+  $$('[data-action="toggleHelp"]').forEach(btn=>{
+    btn.addEventListener('click', ()=>{
+      const id = btn.getAttribute('data-target');
+      const el = document.getElementById(id);
+      const isHidden = el.classList.toggle('hidden');
+      btn.textContent = isHidden ? "Merkkasten anzeigen" : "Merkkasten ausblenden";
+    });
+  });
+
+  // Per-task buttons
+  $$('[data-action="check"]').forEach(btn=>{
+    btn.addEventListener('click', ()=> checkTask(parseInt(btn.getAttribute('data-task'),10)));
+  });
+  $$('[data-action="solution"]').forEach(btn=>{
+    btn.addEventListener('click', ()=> showSolution(parseInt(btn.getAttribute('data-task'),10)));
+  });
+
+  // Sidebar
+  $("#btnCheckAll").addEventListener('click', ()=>{
+    [1,2,3,4,5].forEach(id=>checkTask(id));
+    window.scrollTo({top:0, behavior:"smooth"});
+  });
+  $("#btnShowAll").addEventListener('click', ()=>{
+    [1,2,3,4,5].forEach(id=>showSolution(id));
+  });
+
+  // Top save/reset
+  $("#btnSave").addEventListener('click', ()=>{
+    saveState(true);
+    const s = $("#copyStatus");
+    s.textContent = "Gespeichert ✓";
+    setTimeout(()=>{ s.textContent = ""; }, 1200);
+  });
+
+  $("#btnReset").addEventListener('click', ()=>{
+    if(!confirm("Wirklich alles zurücksetzen (inkl. gespeicherter Eingaben)?")) return;
+    localStorage.removeItem(DASH.storageKey);
+    location.reload();
+  });
+
+  // Level change
+  $("#level").addEventListener('change', ()=>{
+    setVisibleLevelBlocks();
+    restoreState(); // restore for this level
+    updateScore();
+    saveState();
+  });
+}
+
+function updateScore(){
+  const lvl = getLevel();
+  const max = 50; // 5 tasks * 10
+  const got = (pointsByTask[1]||0)+(pointsByTask[2]||0)+(pointsByTask[3]||0)+(pointsByTask[4]||0)+(pointsByTask[5]||0);
+  $("#points").textContent = got;
+  $("#maxPoints").textContent = max;
+  $("#percent").textContent = Math.round((got/max)*100);
+}
+
+function fireConfetti(){
+  const symbols = ['🎉','✨','⭐','🏆'];
+  for(let i=0;i<22;i++){
+    const el = document.createElement('div');
+    el.className = 'confetti';
+    el.textContent = symbols[Math.floor(Math.random()*symbols.length)];
+    el.style.left = Math.random()*100 + "vw";
+    el.style.top = "90vh";
+    el.style.animationDelay = (Math.random()*0.3) + "s";
+    document.body.appendChild(el);
+    setTimeout(()=>el.remove(), 2600);
+  }
+}
+
+/* =========================================================
+   STATE: SAVE/RESTORE
+========================================================= */
+let pointsByTask = {};
+
+function collectState(){
+  const lvl = getLevel();
+  const state = {
+    level: lvl,
+    pointsByTask,
+    answers: {}
+  };
+
+  // inputs
+  $$('input[data-id]').forEach(inp=>{
+    state.answers[inp.getAttribute('data-id')] = inp.value;
+  });
+
+  // radios
+  for(let t=1;t<=1;t++){
+    const task = CONTENT.tasks.find(x=>x.id===t);
+    const items = task.levels[lvl];
+    items.forEach((it, idx)=>{
+      const name = `t1_q${idx}`;
+      const chosen = $$(`input[name="t1_q${idx}"]`).find(r=>r.checked);
+      state.answers[name] = chosen ? chosen.value : "";
+    });
+  }
+
+  return state;
+}
+
+function applyState(state){
+  if(!state) return;
+  if(state.level && state.level !== getLevel()){
+    $("#level").value = state.level;
+    setVisibleLevelBlocks();
+  }
+  pointsByTask = state.pointsByTask || {};
+
+  const ans = state.answers || {};
+  // inputs
+  $$('input[data-id]').forEach(inp=>{
+    const key = inp.getAttribute('data-id');
+    if(ans[key] !== undefined) inp.value = ans[key];
+  });
+
+  // radios for task1
+  const lvl = getLevel();
+  const items = CONTENT.tasks[0].levels[lvl];
+  items.forEach((it, idx)=>{
+    const key = `t1_q${idx}`;
+    const val = ans[key];
+    if(!val) return;
+    const radios = $$(`input[name="t1_q${idx}"]`);
+    radios.forEach(r=>{ r.checked = (normalize(r.value)===normalize(val)); });
+  });
+}
+
+function saveState(showToast=false){
+  const state = collectState();
+  localStorage.setItem(DASH.storageKey, JSON.stringify(state));
+}
+
+function restoreState(){
+  try{
+    const raw = localStorage.getItem(DASH.storageKey);
+    if(!raw) return;
+    const state = JSON.parse(raw);
+    applyState(state);
+  }catch(e){}
+}
+
+function bindInputSave(){
+  // Save on typing, but cheap
+  $$('input[data-id]').forEach(inp=>{
+    inp.oninput = ()=>{ saveState(); };
+  });
+  $$('input[type="radio"]').forEach(r=>{
+    r.onchange = ()=>{ saveState(); };
+  });
+}
+
+/* =========================================================
+   SHARE: QR + link + share/copy
+========================================================= */
+function resolveDashboardUrl(){
+  const href = window.location.href;
+  if(href && href.startsWith("http")) return href;
+  return DASH.fallbackPath;
+}
+
+function setupShare(){
+  const url = resolveDashboardUrl();
+  const shareLink = $("#shareLink");
+  shareLink.textContent = url;
+
+  const qr = $("#qrImg");
+  const qrUrl = "https://api.qrserver.com/v1/create-qr-code/?size=220x220&data=" + encodeURIComponent(url);
+  qr.src = qrUrl;
+
+  $("#btnCopy").addEventListener('click', async ()=>{
+    try{
+      await navigator.clipboard.writeText(url);
+      $("#copyStatus").textContent = "Link kopiert ✓";
+    }catch(e){
+      $("#copyStatus").textContent = "Kopieren nicht möglich – bitte manuell markieren.";
+    }
+    setTimeout(()=>{ $("#copyStatus").textContent = ""; }, 1400);
+  });
+
+  $("#btnShare").addEventListener('click', async ()=>{
+    if(navigator.share){
+      try{
+        await navigator.share({title:document.title, text:"If-Clauses Type 1 – Dashboard", url});
+      }catch(e){}
+    }else{
+      $("#copyStatus").textContent = "Teilen nicht verfügbar – nutze „Link kopieren“.";
+      setTimeout(()=>{ $("#copyStatus").textContent = ""; }, 1600);
+    }
+  });
+}
+
+/* =========================================================
+   INIT
+========================================================= */
+document.addEventListener('DOMContentLoaded', ()=>{
+  renderAll();
+  bindButtons();
+});
+</script>
+
+</body>
+</html>
+
